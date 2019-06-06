@@ -417,13 +417,13 @@ var LoginComponent = /** @class */ (function () {
         var nonce = crypto.codeChallenge(); // url-safe Base64 hash
         crypto.generateUrl(this.url).subscribe(function (data) {
             var redirectUrl = data.redirectUrl, rest = __rest(data, ["redirectUrl"]);
-            var stateParams = JSON.stringify(data); // data that holds state
             var state = crypto.getParameter(redirectUrl, 'state');
-            redirectUrl.replace(state, nonce); // uses nonce as the state
+            var statedRedirectUrl = redirectUrl.replace(state, nonce); // uses nonce as the state
+            var stateParams = JSON.stringify(data); // data that holds state
             localStorage.setItem(nonce, stateParams);
             console.log("state:\n" + state);
             console.log("nonce:\n" + nonce);
-            console.log(redirectUrl); // used to redirect to google auth page
+            console.log(statedRedirectUrl); // used to redirect to google auth page
         });
     };
     LoginComponent = __decorate([
