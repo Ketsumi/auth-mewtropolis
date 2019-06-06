@@ -91,6 +91,8 @@ var AppCryptoService = /** @class */ (function () {
     AppCryptoService.prototype.getParameter = function (parameters, key) {
         var params = parameters[0] === '?' ? parameters.substring(1) : parameters;
         var paramsObj = new URLSearchParams(params);
+        console.log(params);
+        console.log(paramsObj);
         return paramsObj.get(key);
     };
     AppCryptoService.prototype.setStorage = function (key, value) {
