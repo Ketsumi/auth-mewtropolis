@@ -82,8 +82,10 @@ var AppCryptoService = /** @class */ (function () {
         return js_base64__WEBPACK_IMPORTED_MODULE_2__["Base64"].encodeURI(sha_js__WEBPACK_IMPORTED_MODULE_4___default()('sha256').update(data).digest('hex'));
     };
     AppCryptoService.prototype.generateUrl = function (uri) {
+        var _this = this;
         this.http.get(uri).subscribe(function (data) {
             console.log(data);
+            console.log(_this.getParameter(data['redirectUrl'], 'redirectUrl'));
         });
     };
     AppCryptoService.prototype.getParameter = function (parameters, key) {
@@ -95,13 +97,13 @@ var AppCryptoService = /** @class */ (function () {
         if (key === void 0) { key = "null"; }
         if (value === void 0) { value = "null"; }
         var obj = JSON.stringify({ gator: "gao", duck: "quack", exp: Date.now() + 180000 });
-        localStorage.setItem("cat", "meow");
-        localStorage.setItem("cow", "moo");
-        localStorage.setItem("animals", obj);
+        // localStorage.setItem("cat", "meow");
+        // localStorage.setItem("cow", "moo");
+        // localStorage.setItem("animals", obj);
         console.log(window.localStorage);
         // console.log(obj);
         // console.log(JSON.parse(obj));
-        console.log(window.localStorage['animals']);
+        // console.log(window.localStorage['animals']);
     };
     AppCryptoService = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
@@ -169,7 +171,7 @@ var AppRoutingModule = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<!--The content below is only a placeholder and can be replaced.-->\n<div style=\"text-align:center\">\n  <h1>\n    Welcome to {{ title }}!\n  </h1>\n  <img width=\"300\" alt=\"Angular Logo\" src=\"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==\">\n</div>\n<h2>Here are some links to help you start: </h2>\n<ul>\n  <li>\n    <h2><a target=\"_blank\" rel=\"noopener\" href=\"https://angular.io/tutorial\">Tour of Heroes</a></h2>\n  </li>\n  <li>\n    <h2><a target=\"_blank\" rel=\"noopener\" href=\"https://github.com/angular/angular-cli/wiki\">CLI Documentation</a></h2>\n  </li>\n  <li>\n    <h2><a target=\"_blank\" rel=\"noopener\" href=\"https://blog.angular.io/\">Angular blog</a></h2>\n  </li>\n</ul>\n\n<router-outlet></router-outlet>\n"
+module.exports = "<router-outlet></router-outlet>\r\n"
 
 /***/ }),
 
@@ -356,7 +358,7 @@ var CallbackComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<p>\n  login works!\n</p>\n"
+module.exports = "<p>\r\n  login works!\r\n</p>\r\n\r\n<button (click)=\"generateLink()\">Google Login</button>\r\n"
 
 /***/ }),
 
@@ -397,6 +399,7 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
 var LoginComponent = /** @class */ (function () {
     function LoginComponent(AppCrypto) {
         this.AppCrypto = AppCrypto;
+        this.url = 'https://auth.mewtropolis.me/api/auth/google';
     }
     LoginComponent.prototype.ngOnInit = function () {
         try {
@@ -409,14 +412,13 @@ var LoginComponent = /** @class */ (function () {
             // console.log('test: codeChallenge');
             // console.log(`${challenge}\n\n`);
             // console.log(`${this.AppCrypto.decode(challenge)}`);
-            this.AppCrypto.generateUrl('https://auth.mewtropolis.me/api/auth/google');
         }
         catch (err) {
             console.log(err.message);
         }
     };
     LoginComponent.prototype.generateLink = function () {
-        // http
+        this.AppCrypto.generateUrl(this.url);
     };
     LoginComponent = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
