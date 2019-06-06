@@ -415,11 +415,8 @@ var LoginComponent = /** @class */ (function () {
     LoginComponent.prototype.redirect = function () {
         var _this = this;
         this.AppCrypto.generateUrl(this.url).subscribe(function (data) {
-            var url = data.url, rest = __rest(data, ["url"]);
-            console.log(data);
-            console.log(url);
-            console.log(rest);
-            var _a = _this.nonceAsState(url), redirectUrl = _a.redirectUrl, nonce = _a.nonce;
+            var redirectUrl = data.redirectUrl, rest = __rest(data, ["redirectUrl"]);
+            var _a = _this.nonceAsState(redirectUrl), authUrl = _a.authUrl, nonce = _a.nonce;
             var stateParams = JSON.stringify(data); // data that holds state
             localStorage.setItem(nonce, stateParams);
         });
@@ -427,11 +424,11 @@ var LoginComponent = /** @class */ (function () {
     LoginComponent.prototype.nonceAsState = function (url) {
         var nonce = this.AppCrypto.codeChallenge(); // url-safe Base64 hash
         var state = this.AppCrypto.getParameter(url, 'state');
-        var redirectUrl = url.replace(state, nonce);
+        var authUrl = url.replace(state, nonce);
         console.log("state:\n" + state);
         console.log("nonce:\n" + nonce);
-        console.log("redirectUrl:\n" + redirectUrl); // used to redirect to google auth page
-        return { redirectUrl: redirectUrl, nonce: nonce };
+        console.log("authUrl:\n" + authUrl); // used to redirect to google auth page
+        return { authUrl: authUrl, nonce: nonce };
     };
     LoginComponent = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
