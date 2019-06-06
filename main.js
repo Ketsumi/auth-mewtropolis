@@ -416,7 +416,7 @@ var LoginComponent = /** @class */ (function () {
         var _this = this;
         this.AppCrypto.generateUrl(this.url).subscribe(function (data) {
             var url = data.url, rest = __rest(data, ["url"]);
-            console.log(url);
+            console.log(data);
             var _a = _this.nonceAsState(url), redirectUrl = _a.redirectUrl, nonce = _a.nonce;
             var stateParams = JSON.stringify(data); // data that holds state
             localStorage.setItem(nonce, stateParams);
