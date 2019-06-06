@@ -82,30 +82,12 @@ var AppCryptoService = /** @class */ (function () {
         return js_base64__WEBPACK_IMPORTED_MODULE_2__["Base64"].encodeURI(sha_js__WEBPACK_IMPORTED_MODULE_4___default()('sha256').update(data).digest('hex'));
     };
     AppCryptoService.prototype.generateUrl = function (uri) {
-        var _this = this;
-        this.http.get(uri).subscribe(function (data) {
-            console.log(data);
-            console.log(_this.getParameter(data['redirectUrl'], 'redirectUrl'));
-        });
+        return this.http.get(uri);
     };
     AppCryptoService.prototype.getParameter = function (parameters, key) {
         var params = parameters[0] === '?' ? parameters.substring(1) : parameters;
         var paramsObj = new URLSearchParams(params);
-        console.log(params);
-        console.log(paramsObj);
         return paramsObj.get(key);
-    };
-    AppCryptoService.prototype.setStorage = function (key, value) {
-        if (key === void 0) { key = "null"; }
-        if (value === void 0) { value = "null"; }
-        var obj = JSON.stringify({ gator: "gao", duck: "quack", exp: Date.now() + 180000 });
-        // localStorage.setItem("cat", "meow");
-        // localStorage.setItem("cow", "moo");
-        // localStorage.setItem("animals", obj);
-        console.log(window.localStorage);
-        // console.log(obj);
-        // console.log(JSON.parse(obj));
-        // console.log(window.localStorage['animals']);
     };
     AppCryptoService = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
@@ -332,7 +314,7 @@ var CallbackComponent = /** @class */ (function () {
     CallbackComponent.prototype.ngOnInit = function () {
         try {
             console.log(this.AppCrypto.getParameter(window.location.search, 'state'));
-            this.AppCrypto.setStorage();
+            // this.AppCrypto.setStorage();
         }
         catch (err) {
             console.log(err.message);
@@ -360,7 +342,7 @@ var CallbackComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<p>\r\n  login works!\r\n</p>\r\n\r\n<button (click)=\"generateLink()\">Google Login</button>\r\n"
+module.exports = "<p>\r\n  login works!\r\n</p>\r\n\r\n<button (click)=\"redirect()\">Google Login</button>\r\n"
 
 /***/ }),
 
@@ -396,6 +378,15 @@ var __decorate = (undefined && undefined.__decorate) || function (decorators, ta
 var __metadata = (undefined && undefined.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __rest = (undefined && undefined.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) if (e.indexOf(p[i]) < 0)
+            t[p[i]] = s[p[i]];
+    return t;
+};
 
 
 var LoginComponent = /** @class */ (function () {
@@ -405,8 +396,9 @@ var LoginComponent = /** @class */ (function () {
     }
     LoginComponent.prototype.ngOnInit = function () {
         try {
-            var randomData = this.AppCrypto.randomBytes(32);
-            var challenge = this.AppCrypto.codeChallenge();
+            // const randomData = this.AppCrypto.randomBytes(32);
+            // const challenge = this.AppCrypto.codeChallenge();
+            // const urlTest = 'https://accounts.google.com/o/oauth2/v2/auth?client_id=986484840298-7sk3u5a07btmvpl4r4uqi0s5m9qrnljo.apps.googleusercontent.com&scope=openid&response_type=code%20id_token&redirect_uri=http%3A%2F%2Fauth.mewtropolis.me%2Fapi%2Fauth%2Fcallback&state=7wn9Muc7EA7RA7uN_dRj3UXfPy8pdnnLtxtV7DauzJ0&nonce=livC9NI01e40v0t4kUfWJCQ9bN7N1j0_d8TQxAnrCos';
             // console.log('test: randombytes');
             // console.log(`${randomData}\n\n`);
             // console.log('test: random');
@@ -414,13 +406,25 @@ var LoginComponent = /** @class */ (function () {
             // console.log('test: codeChallenge');
             // console.log(`${challenge}\n\n`);
             // console.log(`${this.AppCrypto.decode(challenge)}`);
+            // console.log(`${this.AppCrypto.getParameter(urlTest, 'state')}`);
         }
         catch (err) {
             console.log(err.message);
         }
     };
-    LoginComponent.prototype.generateLink = function () {
-        this.AppCrypto.generateUrl(this.url);
+    LoginComponent.prototype.redirect = function () {
+        var crypto = this.AppCrypto;
+        var nonce = crypto.codeChallenge(); // url-safe Base64 hash
+        crypto.generateUrl(this.url).subscribe(function (data) {
+            var redirectUrl = data.redirectUrl, rest = __rest(data, ["redirectUrl"]);
+            var stateParams = JSON.stringify(data); // data that holds state
+            var state = crypto.getParameter(redirectUrl, 'state');
+            redirectUrl.replace(state, nonce); // uses nonce as the state
+            localStorage.setItem(nonce, stateParams);
+            console.log("state:\n" + state);
+            console.log("nonce:\n" + nonce);
+            console.log(redirectUrl); // used to redirect to google auth page
+        });
     };
     LoginComponent = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
