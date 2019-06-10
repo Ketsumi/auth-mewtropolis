@@ -85,7 +85,7 @@ var AppCryptoService = /** @class */ (function () {
         return this.http.get(uri);
     };
     AppCryptoService.prototype.getParameter = function (parameters, key) {
-        var params = parameters[0] === '#' || '?' ? parameters.substring(1) : parameters;
+        var params = parameters[0] === '?' || '#' ? parameters.substring(1) : parameters;
         var paramsObj = new URLSearchParams(params);
         return paramsObj.get(key);
     };
@@ -327,13 +327,13 @@ var CallbackComponent = /** @class */ (function () {
         }
     };
     CallbackComponent.prototype.getStateToken = function () {
-        var location = window.location.hash;
+        var location = window.location.hash || window.location.search;
         var state = this.AppCrypto.getParameter(location, 'state');
         var base64Token = localStorage.getItem(state);
         return base64Token;
     };
     CallbackComponent.prototype.getIdToken = function () {
-        var location = window.location.hash;
+        var location = window.location.hash || window.location.search;
         var base64_id_token = this.AppCrypto.getParameter(location, 'id_token');
         return base64_id_token;
     };
@@ -358,8 +358,8 @@ var CallbackComponent = /** @class */ (function () {
         if (this.verifyTokens(state_token, id_token)) {
             console.log("verified: " + true);
             console.log(state_token.REDIRECT_URL);
-            console.log(state_token);
-            console.log(id_token);
+            // console.log(state_token);
+            // console.log(id_token);
         }
         else {
             console.log("verified: " + false);
