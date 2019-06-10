@@ -451,9 +451,8 @@ var LoginComponent = /** @class */ (function () {
     };
     LoginComponent.prototype.redirect = function () {
         var _this = this;
-        this.AppCrypto.generateUrl(this.url).subscribe(function (url) {
-            console.log(url);
-            var authUrl = _this.nonceAsState(url); // authUrl with new nonce as state
+        this.AppCrypto.generateUrl(this.url).subscribe(function (res) {
+            var authUrl = _this.nonceAsState(res.data); // authUrl with new nonce as state
             window.open(authUrl, '_self');
         });
     };
