@@ -443,7 +443,7 @@ var LoginComponent = /** @class */ (function () {
             // console.log(`${this.AppCrypto.getParameter(urlTest, 'state')}`);
             // const mockAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth?client_id=986484840298-7sk3u5a07btmvpl4r4uqi0s5m9qrnljo.apps.googleusercontent.com&scope=openid%20email&response_type=code%20id_token&redirect_uri=https%3A%2F%2Fketsumi.github.io%2Fauth-mewtropolis%2Fcallback&nonce=GB9sJNbASzUxva72TRoLzYr-ouda3hF-Uu8PgxSjm_E&state=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJSRURJUkVDVF9VUkwiOiJodHRwOi8vYXV0aC5tZXd0cm9wb2xpcy5tZS9hcGkvYXV0aC9jYWxsYmFjayIsIm5vbmNlIjoieWtSNUowUFdVX3VvWGU2NkhOaHlzSFFCcFRSVVNmMUlfQXZwazRGZ0NTSSIsImF1ZCI6Ijk4NjQ4NDg0MDI5OC03c2szdTVhMDdidG12cGw0cjR1cWkwczVtOXFybmxqby5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImV4cCI6MTU2MDE0NzgwMCwiaWF0IjoxNTYwMTQ3NjIwfQ.wcSixE4cD9Cb6Ttx9UsEhIpsnYBGL9D2TBM7a-74fqM';
             // const authUrl = this.nonceAsState(mockAuthUrl); // test
-            this.redirect();
+            // this.redirect();
         }
         catch (err) {
             console.log(err.message);
@@ -460,7 +460,7 @@ var LoginComponent = /** @class */ (function () {
         if (save === void 0) { save = true; }
         var nonce = this.AppCrypto.codeChallenge(); // url-safe Base64 hash
         var state = this.AppCrypto.getParameter(url, 'state'); // state token
-        var authUrl = this.url.replace(state, nonce);
+        var authUrl = url.replace(state, nonce);
         console.log("state:\n" + state);
         console.log("nonce:\n" + nonce);
         console.log("authUrl:\n" + authUrl); // used to redirect to google auth page
