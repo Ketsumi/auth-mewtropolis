@@ -85,7 +85,7 @@ var AppCryptoService = /** @class */ (function () {
         return this.http.get(uri);
     };
     AppCryptoService.prototype.getParameter = function (parameters, key) {
-        var params = parameters[0] === '?' ? parameters.substring(1) : parameters;
+        var params = parameters[0] === '#' || '?' ? parameters.substring(1) : parameters;
         var paramsObj = new URLSearchParams(params);
         return paramsObj.get(key);
     };
@@ -327,12 +327,14 @@ var CallbackComponent = /** @class */ (function () {
         }
     };
     CallbackComponent.prototype.getStateToken = function () {
-        var state = this.AppCrypto.getParameter(window.location.search, 'state');
+        var location = window.location.hash;
+        var state = this.AppCrypto.getParameter(location, 'state');
         var base64Token = localStorage.getItem(state);
         return base64Token;
     };
     CallbackComponent.prototype.getIdToken = function () {
-        var base64_id_token = this.AppCrypto.getParameter(window.location.search, 'id_token');
+        var location = window.location.hash;
+        var base64_id_token = this.AppCrypto.getParameter(location, 'id_token');
         return base64_id_token;
     };
     CallbackComponent.prototype.parseToken = function (base64Token) {
@@ -345,7 +347,7 @@ var CallbackComponent = /** @class */ (function () {
         var nonce = state_token.nonce === id_token.nonce;
         var aud = state_token.aud === id_token.aud;
         var time = Math.floor(Date.now() / 1000);
-        var exp = state_token.exp > time && id_token.exp > time;
+        var exp = state_token.exp && id_token.exp > time;
         console.log("time: " + time);
         console.log("nonce: " + nonce);
         console.log("aud: " + aud);
