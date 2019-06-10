@@ -313,11 +313,54 @@ var CallbackComponent = /** @class */ (function () {
     }
     CallbackComponent.prototype.ngOnInit = function () {
         try {
-            console.log(this.AppCrypto.getParameter(window.location.search, 'state'));
-            // this.AppCrypto.setStorage();
+            var state_token = this.parseToken(this.getStateToken());
+            var id_token = this.parseToken(this.getIdToken());
+            // const verified = this.verifyTokens(state_token, id_token);
+            // console.log(state_token.REDIRECT_URL);
+            console.log(state_token);
+            console.log(id_token);
+            // console.log(`verified: ${verified}`);
+            this.redirect(state_token, id_token);
         }
         catch (err) {
             console.log(err.message);
+        }
+    };
+    CallbackComponent.prototype.getStateToken = function () {
+        var state = this.AppCrypto.getParameter(window.location.search, 'state');
+        var base64Token = localStorage.getItem(state);
+        return base64Token;
+    };
+    CallbackComponent.prototype.getIdToken = function () {
+        var base64_id_token = this.AppCrypto.getParameter(window.location.search, 'id_token');
+        return base64_id_token;
+    };
+    CallbackComponent.prototype.parseToken = function (base64Token) {
+        var tokenPayload = base64Token.split('.')[1];
+        var tokenString = this.AppCrypto.decode(tokenPayload);
+        var token = JSON.parse(tokenString);
+        return token;
+    };
+    CallbackComponent.prototype.verifyTokens = function (state_token, id_token) {
+        var nonce = state_token.nonce === id_token.nonce;
+        var aud = state_token.aud === id_token.aud;
+        var time = Math.floor(Date.now() / 1000);
+        var exp = state_token.exp > time && id_token.exp > time;
+        console.log("time: " + time);
+        console.log("nonce: " + nonce);
+        console.log("aud: " + aud);
+        console.log("exp: " + exp);
+        return (nonce && aud && exp);
+    };
+    CallbackComponent.prototype.redirect = function (state_token, id_token) {
+        if (this.verifyTokens(state_token, id_token)) {
+            console.log("verified: " + true);
+            console.log(state_token.REDIRECT_URL);
+            console.log(state_token);
+            console.log(id_token);
+        }
+        else {
+            console.log("verified: " + false);
         }
     };
     CallbackComponent = __decorate([
@@ -378,15 +421,6 @@ var __decorate = (undefined && undefined.__decorate) || function (decorators, ta
 var __metadata = (undefined && undefined.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __rest = (undefined && undefined.__rest) || function (s, e) {
-    var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) if (e.indexOf(p[i]) < 0)
-            t[p[i]] = s[p[i]];
-    return t;
-};
 
 
 var LoginComponent = /** @class */ (function () {
@@ -407,6 +441,9 @@ var LoginComponent = /** @class */ (function () {
             // console.log(`${challenge}\n\n`);
             // console.log(`${this.AppCrypto.decode(challenge)}`);
             // console.log(`${this.AppCrypto.getParameter(urlTest, 'state')}`);
+            var mockAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth?client_id=986484840298-7sk3u5a07btmvpl4r4uqi0s5m9qrnljo.apps.googleusercontent.com&scope=openid%20email&response_type=code%20id_token&redirect_uri=https%3A%2F%2Fketsumi.github.io%2Fauth-mewtropolis%2Fcallback&nonce=GB9sJNbASzUxva72TRoLzYr-ouda3hF-Uu8PgxSjm_E&state=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJSRURJUkVDVF9VUkwiOiJodHRwOi8vYXV0aC5tZXd0cm9wb2xpcy5tZS9hcGkvYXV0aC9jYWxsYmFjayIsIm5vbmNlIjoieWtSNUowUFdVX3VvWGU2NkhOaHlzSFFCcFRSVVNmMUlfQXZwazRGZ0NTSSIsImF1ZCI6Ijk4NjQ4NDg0MDI5OC03c2szdTVhMDdidG12cGw0cjR1cWkwczVtOXFybmxqby5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImV4cCI6MTU2MDE0NzgwMCwiaWF0IjoxNTYwMTQ3NjIwfQ.wcSixE4cD9Cb6Ttx9UsEhIpsnYBGL9D2TBM7a-74fqM';
+            var authUrl = this.nonceAsState(mockAuthUrl); // test
+            // this.redirect();
         }
         catch (err) {
             console.log(err.message);
@@ -414,21 +451,22 @@ var LoginComponent = /** @class */ (function () {
     };
     LoginComponent.prototype.redirect = function () {
         var _this = this;
-        this.AppCrypto.generateUrl(this.url).subscribe(function (data) {
-            var redirectUrl = data.redirectUrl, rest = __rest(data, ["redirectUrl"]);
-            var _a = _this.nonceAsState(redirectUrl), authUrl = _a.authUrl, nonce = _a.nonce;
-            var stateParams = JSON.stringify(data); // data that holds state
-            localStorage.setItem(nonce, stateParams);
+        this.AppCrypto.generateUrl(this.url).subscribe(function (url) {
+            var authUrl = _this.nonceAsState(url); // authUrl with new nonce as state
+            // window.open(authUrl, '_self');
         });
     };
-    LoginComponent.prototype.nonceAsState = function (url) {
+    LoginComponent.prototype.nonceAsState = function (url, save) {
+        if (save === void 0) { save = true; }
         var nonce = this.AppCrypto.codeChallenge(); // url-safe Base64 hash
-        var state = this.AppCrypto.getParameter(url, 'state');
+        var state = this.AppCrypto.getParameter(url, 'state'); // state token
         var authUrl = url.replace(state, nonce);
         console.log("state:\n" + state);
         console.log("nonce:\n" + nonce);
         console.log("authUrl:\n" + authUrl); // used to redirect to google auth page
-        return { authUrl: authUrl, nonce: nonce };
+        if (save)
+            localStorage.setItem(nonce, state);
+        return authUrl;
     };
     LoginComponent = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
